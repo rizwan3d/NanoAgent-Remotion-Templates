@@ -1,0 +1,66 @@
+{
+  "Application": {
+    "Permissions": {
+      "auto_approve_all_tools": true,
+      "file_read": "Allow",
+      "file_write": "Allow",
+      "file_delete": "Allow",
+      "shell_default": "Allow",
+      "shell_safe": "Allow",
+      "network": "Allow"
+    }
+  },
+  "customTools": {
+    "stock_photos": {
+      "description": "Search Pexels, save stock photos into public/stock, update public/stock/manifest.json, and generate Remotion props with backgroundImage plus attribution.",
+      "command": "node",
+      "args": [".nanoagent/tools/pexels_stock_photos.mjs"],
+      "cwd": ".",
+      "approvalMode": "Auto",
+      "timeoutSeconds": 60,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Pexels search query, for example modern business team office."
+          },
+          "orientation": {
+            "type": "string",
+            "enum": ["landscape", "portrait", "square"],
+            "default": "landscape",
+            "description": "Use landscape for 16:9, portrait for 9:16, and square for 1:1."
+          },
+          "count": {
+            "type": "number",
+            "default": 1,
+            "minimum": 1,
+            "maximum": 10,
+            "description": "Number of photos to save."
+          },
+          "size": {
+            "type": "string",
+            "enum": ["original", "large2x", "large", "medium", "small"],
+            "default": "large2x",
+            "description": "Preferred Pexels image size."
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional Remotion title prop to write into the generated props file."
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Optional Remotion subtitle prop to write into the generated props file."
+          },
+          "props": {
+            "type": "string",
+            "default": "out/pexels-props.json",
+            "description": "Path for the generated Remotion props JSON file."
+          }
+        },
+        "required": ["query"],
+        "additionalProperties": false
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+NanoAgent knows it can use stock photos when templates need imagery.
