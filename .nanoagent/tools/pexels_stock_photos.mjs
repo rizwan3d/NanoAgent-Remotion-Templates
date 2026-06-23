@@ -6,7 +6,9 @@ import path from "node:path";
 import process from "node:process";
 
 const ORIENTATIONS = new Set(["landscape", "portrait", "square"]);
-const SIZES = new Set(["original", "large2x", "large", "medium", "small"]);
+const MEDIA_TYPES = new Set(["photo", "video"]);
+const PHOTO_SIZES = new Set(["original", "large2x", "large", "medium", "small"]);
+const VIDEO_SIZES = new Set(["large", "medium", "small"]);
 
 const readStdinJson = async () => {
   const chunks = [];
@@ -59,11 +61,36 @@ const normalizeArgs = (args) => {
     invalidArguments("Missing required argument: query");
   }
 
+  const media =
+    typeof args.media === "string"
+      ? args.media
+      : "photo";
+
+  if (!MEDIA_TYPES.has(media)) {
+    invalidArguments("media must be photo or video");
+  }
+
   const orientation = ORIENTATIONS.has(args.orientation)
     ? args.orientation
     : "landscape";
 
-  const size = SIZES.has(args.size) ? args.size : "large2x";
+  const requestedSize = typeof args.size === "string" ? args.size : "";
+  if (requestedSize && media === "video" && !VIDEO_SIZES.has(requestedSize)) {
+    invalidArguments("size for video must be large, medium, or small");
+  }
+
+  if (requestedSize && media === "photo" && !PHOTO_SIZES.has(requestedSize)) {
+    invalidArguments("size for photo must be original, large2x, large, medium, or small");
+  }
+
+  const size =
+    media === "video"
+      ? VIDEO_SIZES.has(requestedSize)
+        ? requestedSize
+        : "large"
+      : PHOTO_SIZES.has(requestedSize)
+        ? requestedSize
+        : "large2x";
   const countNumber = Number(args.count ?? 1);
   const count = Number.isFinite(countNumber)
     ? Math.max(1, Math.min(Math.round(countNumber), 10))
@@ -76,6 +103,7 @@ const normalizeArgs = (args) => {
 
   return {
     query,
+    media,
     orientation,
     count,
     size,
@@ -91,6 +119,8 @@ const runNodeScript = ({ workspacePath, args }) => {
       "scripts/pexels-assets.mjs",
       "--query",
       args.query,
+      "--media",
+      args.media,
       "--orientation",
       args.orientation,
       "--count",
@@ -168,9 +198,10 @@ const main = async () => {
 
   writeResponse({
     status: "success",
-    message: "Saved Pexels stock photo assets and generated Remotion props.",
+    message: `Saved Pexels stock ${args.media} assets and generated Remotion props.`,
     data: {
       provider: "pexels",
+      media: args.media,
       query: args.query,
       orientation: args.orientation,
       count: args.count,
@@ -179,15 +210,21 @@ const main = async () => {
       manifestPath: "public/stock/manifest.json",
       propsPath: args.props,
       backgroundImage: propsJson?.backgroundImage || null,
+      backgroundVideo: propsJson?.backgroundVideo || null,
       attribution: propsJson?.attribution || null,
       manifestPhotoCount: Array.isArray(manifestJson?.photos)
         ? manifestJson.photos.length
         : null,
+      manifestVideoCount: Array.isArray(manifestJson?.videos)
+        ? manifestJson.videos.length
+        : null,
       stdout: result.stdout.trim(),
     },
-    renderText: propsJson?.backgroundImage
-      ? `Saved ${args.count} Pexels photo(s). Use ${propsJson.backgroundImage} as backgroundImage.`
-      : `Saved ${args.count} Pexels photo(s) and wrote props to ${args.props}.`,
+    renderText: propsJson?.backgroundVideo
+      ? `Saved ${args.count} Pexels video(s). Use ${propsJson.backgroundVideo} as backgroundVideo.`
+      : propsJson?.backgroundImage
+        ? `Saved ${args.count} Pexels photo(s). Use ${propsJson.backgroundImage} as backgroundImage.`
+        : `Saved ${args.count} Pexels ${args.media}(s) and wrote props to ${args.props}.`,
   });
 };
 

@@ -1,1 +1,1 @@
-NanoAgent knows it can use stock photos when templates need imagery.
+NanoAgent knows it can use Pexels stock photos and stock videos when templates need imagery.

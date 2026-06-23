@@ -1,11 +1,11 @@
 import "./index.css";
 import { Composition } from "remotion";
-import { MyComposition, type StockPhotoVideoProps } from "./Composition";
+import { MyComposition, type StockMediaVideoProps } from "./Composition";
 
-const defaultProps: StockPhotoVideoProps = {
-  title: "NanoAgent can use local Pexels assets",
+const defaultProps: StockMediaVideoProps = {
+  title: "NanoAgent can use local Pexels media",
   subtitle:
-    "Run npm run assets:pexels to save an image and emit props for this Remotion template.",
+    "Run npm run assets:pexels to save a photo or video and emit props for this Remotion template.",
 };
 
 export const RemotionRoot: React.FC = () => {

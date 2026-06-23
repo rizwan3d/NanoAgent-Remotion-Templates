@@ -12,7 +12,7 @@
   },
   "customTools": {
     "stock_photos": {
-      "description": "Search Pexels, save stock photos into public/stock, update public/stock/manifest.json, and generate Remotion props with backgroundImage plus attribution.",
+      "description": "Search Pexels, save stock photos or videos into public/stock, update public/stock/manifest.json, and generate Remotion props with backgroundImage or backgroundVideo plus attribution.",
       "command": "node",
       "args": [".nanoagent/tools/pexels_stock_photos.mjs"],
       "cwd": ".",
@@ -25,6 +25,12 @@
             "type": "string",
             "description": "Pexels search query, for example modern business team office."
           },
+          "media": {
+            "type": "string",
+            "enum": ["photo", "video"],
+            "default": "photo",
+            "description": "Choose whether to download a stock photo or a stock video."
+          },
           "orientation": {
             "type": "string",
             "enum": ["landscape", "portrait", "square"],
@@ -36,13 +42,12 @@
             "default": 1,
             "minimum": 1,
             "maximum": 10,
-            "description": "Number of photos to save."
+            "description": "Number of assets to save."
           },
           "size": {
             "type": "string",
             "enum": ["original", "large2x", "large", "medium", "small"],
-            "default": "large2x",
-            "description": "Preferred Pexels image size."
+            "description": "For photos: original, large2x, large, medium, small. For videos: large, medium, small."
           },
           "title": {
             "type": "string",

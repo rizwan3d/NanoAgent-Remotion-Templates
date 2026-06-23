@@ -1,6 +1,7 @@
 import {
   AbsoluteFill,
   Img,
+  OffthreadVideo,
   interpolate,
   spring,
   staticFile,
@@ -10,26 +11,30 @@ import {
 
 export type PexelsAttribution = {
   provider: "pexels";
-  photographer: string;
-  photographerUrl: string;
+  mediaType: "photo" | "video";
+  creatorName: string | null;
+  creatorUrl: string | null;
   sourceUrl: string;
 };
 
-export type StockPhotoVideoProps = {
+export type StockMediaVideoProps = {
   title: string;
   subtitle: string;
   backgroundImage?: string;
+  backgroundVideo?: string;
   attribution?: PexelsAttribution;
 };
 
-export const MyComposition: React.FC<StockPhotoVideoProps> = ({
+export const MyComposition: React.FC<StockMediaVideoProps> = ({
   title,
   subtitle,
   backgroundImage,
+  backgroundVideo,
   attribution,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const creditName = attribution?.creatorName || "Pexels contributor";
 
   const imageScale = spring({
     frame,
@@ -51,7 +56,20 @@ export const MyComposition: React.FC<StockPhotoVideoProps> = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#09090b", overflow: "hidden" }}>
-      {backgroundImage ? (
+      {backgroundVideo ? (
+        <AbsoluteFill style={{ transform: "scale(1.02)" }}>
+          <OffthreadVideo
+            src={staticFile(backgroundVideo)}
+            muted
+            style={{
+              height: "100%",
+              objectFit: "cover",
+              opacity: 0.74,
+              width: "100%",
+            }}
+          />
+        </AbsoluteFill>
+      ) : backgroundImage ? (
         <AbsoluteFill style={{ transform: `scale(${imageScale})` }}>
           <Img
             src={staticFile(backgroundImage)}
@@ -140,7 +158,8 @@ export const MyComposition: React.FC<StockPhotoVideoProps> = ({
             position: "absolute",
           }}
         >
-          Photo by {attribution.photographer} on Pexels
+          {attribution.mediaType === "video" ? "Video" : "Photo"} by {creditName} on
+          {" "}Pexels
         </div>
       ) : null}
     </AbsoluteFill>
